@@ -1,0 +1,30 @@
+﻿<Page
+    x:Class="W10MMineSweeper.CreditsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:W10MMineSweeper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" FontSize="30" TextAlignment="Center">Credits</TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Center" >
+            This app has been developed by Emil215p.<LineBreak/>
+            <LineBreak/>Contact:<LineBreak/>Emil215p@gmail.com<LineBreak/><LineBreak/>
+            With help from:
+        </TextBlock>
+        
+        <Button Grid.Row="2" Grid.Column="0" Content="Return" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Green" FontSize="20" Padding="20, 10, 20, 10" Click="ReturnButton_Click"/>
+    </Grid>
+</Page>
