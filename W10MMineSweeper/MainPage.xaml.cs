@@ -37,7 +37,7 @@ namespace W10MMineSweeper
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Frame.Navigate(typeof(SettingsPage));
         }
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
