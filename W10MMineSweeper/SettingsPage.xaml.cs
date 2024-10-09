@@ -31,5 +31,18 @@ namespace W10MMineSweeper
         {
             Frame.Navigate(typeof(MainPage));
         }
+
+        private void MuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+        private void DifficultyButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void ThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
