@@ -4,7 +4,7 @@
   <mp:PhoneIdentity PhoneProductId="069cba69-30ff-4d46-88b7-e8ba0466bd98" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>W10MMineSweeper</DisplayName>
-    <PublisherDisplayName>juele</PublisherDisplayName>
+    <PublisherDisplayName>Emil215p</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>

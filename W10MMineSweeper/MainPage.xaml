@@ -22,16 +22,20 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="20" TextAlignment="Center" VerticalAlignment="Center">Welcome to Minesweeper!</TextBlock>
+        <Border Grid.Row="0" Grid.ColumnSpan="3" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" MaxWidth="300" CornerRadius="10" Background="Gray">
+            <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="20" TextAlignment="Center" VerticalAlignment="Center">Welcome to Minesweeper!</TextBlock>
+        </Border>
         
-        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" CornerRadius="10">
-            <TextBlock FontSize="10" TextAlignment="Center" VerticalAlignment="Center">V 0.1<LineBreak/>Built 28-09-2024<LineBreak/>By Emil215p</TextBlock>
+        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" CornerRadius="10" Background="Gray">
+            <TextBlock FontSize="10" TextAlignment="Center" VerticalAlignment="Center">V 0.1<LineBreak/>Built 09-10-2024<LineBreak/>By Emil215p</TextBlock>
         </Border>
 
-        <Button Grid.Row="1" Grid.Column="1" Content="Start" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Green" FontSize="20" Padding="20, 10, 20, 10" Click="StartButton_Click"/>
-        <Button Grid.Row="2" Grid.Column="1" Content="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Blue" FontSize="20" Padding="20, 10, 20, 10" Click="SettingsButton_Click"/>
+            <Button Grid.Row="1" Grid.Column="1" Content="Start" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Pink" FontSize="20" Padding="20, 10, 20, 10" Click="StartButton_Click"/>
+            <Button Grid.Row="2" Grid.Column="1" Content="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Blue" FontSize="20" Padding="20, 10, 20, 10" Click="SettingsButton_Click"/>
+            <Button Grid.Row="3" Grid.Column="1" Content="Credits" HorizontalAlignment="Center" VerticalAlignment="Center" Background="DarkSalmon" FontSize="20" Padding="20, 10, 20, 10" Click="CreditsButton_Click"/>
+        
+        
         <Button Grid.Row="4" Grid.Column="0" Content="Exit" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Red" FontSize="20" Padding="20, 10, 20, 10" Click="ExitButton_Click"/>
-        <Button Grid.Row="3" Grid.Column="1" Content="Credits" HorizontalAlignment="Center" VerticalAlignment="Center" Background="DarkSalmon" FontSize="20" Padding="20, 10, 20, 10" Click="CreditsButton_Click"/>
         <Button Grid.Row="4" Grid.Column="2" Content="Help" HorizontalAlignment="Center" VerticalAlignment="Center" Background="DarkGreen" FontSize="20" Padding="20, 10, 20, 10" Click="HelpButton_Click"/>
     </Grid>
 </Page>
