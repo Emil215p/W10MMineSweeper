@@ -10,21 +10,38 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="20" TextAlignment="Center" VerticalAlignment="Center">Minesweeper</TextBlock>
+            <Border Grid.Row="0" Grid.ColumnSpan="3" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" MaxWidth="300" CornerRadius="10" Background="Gray">
+             <TextBlock Grid.Row="0" Grid.ColumnSpan="3" FontSize="20" TextAlignment="Center" VerticalAlignment="Center">Minesweeper</TextBlock>
+            </Border>
 
-        <Button Grid.Row="4" Grid.Column="0" Content="Return" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Red" FontSize="20" Padding="20, 10, 20, 10" Click="ReturnButton_Click"/>
-        <Button Grid.Row="4" Grid.Column="2" Content="Restart" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Red" FontSize="20" Padding="20, 10, 20, 10" Click="RestartButton_Click"/>
+        <Grid x:Name="SweepGrid" Grid.ColumnSpan="3" Grid.Row="1" Background="Gray" Margin="24, 0" BorderBrush="Black" BorderThickness="2">
+
+        </Grid>
+
+        <Border Grid.Row="0" Grid.Column="0">
+            <Button Content="X" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Red" FontSize="20" Padding="10, 10" Click="ReturnButton_Click"/>
+        </Border>
+        
+        <Border Grid.Row="0" Grid.Column="2" BorderBrush="Black" BorderThickness="1" CornerRadius="90" Background="Blue" Margin="5">
+            <Button Content="↺" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Blue" FontSize="28" Padding="10, 0, 10, 5" Click="RestartButton_Click"/>
+        </Border>
+
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="20, 10, 20, 5" BorderBrush="Black" BorderThickness="2" CornerRadius="10" Background="Gray">
+        <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Left" VerticalAlignment="Center" Margin="10, 0">
+            Mines:
+            <LineBreak />
+            30
+        </TextBlock>
+        </Border>
     </Grid>
 </Page>
