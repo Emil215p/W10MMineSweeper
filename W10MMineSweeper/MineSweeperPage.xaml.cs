@@ -99,6 +99,18 @@ namespace W10MMineSweeper
             }
         }
 
+        private async void DisplayResetDialog()
+        {
+            ContentDialog ResetDialog = new ContentDialog
+            {
+                Title = "Do you want to reset?",
+                Content = "Thats cool but it has not been implemented yet.",
+                CloseButtonText = "OK"
+            };
+
+            ContentDialogResult result = await ResetDialog.ShowAsync();
+        }
+
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MainPage));
@@ -106,7 +118,7 @@ namespace W10MMineSweeper
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
         {
-            // Restart button functionality here
+            DisplayResetDialog();
         }
     }
 }
