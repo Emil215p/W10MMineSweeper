@@ -13,14 +13,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+using Windows.UI.Core;
 
 namespace W10MMineSweeper
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MineSweeperPage : Page
     {
         public MineSweeperPage()
@@ -29,34 +25,30 @@ namespace W10MMineSweeper
             _ = GridSizeDialogAsync();
         }
 
-
         private async Task GridSizeDialogAsync()
         {
-            // Create the ContentDialog
             ContentDialog inputDialog = new ContentDialog()
             {
-                Title = "Set Grid Size",
+                Title = "Set Grid Size (Default is 13)",
                 PrimaryButtonText = "OK",
-                SecondaryButtonText = "Cancel",
                 Content = new StackPanel
                 {
                     Children =
-            {
-                new TextBox
-                {
-                    Name = "gridSizeTextBox",
-                    Header = "Grid Size",
-                    PlaceholderText = "Enter grid size...",
-                    InputScope = new InputScope
                     {
-                        Names = { new InputScopeName { NameValue = InputScopeNameValue.Number } }
+                        new TextBox
+                        {
+                            Name = "gridSizeTextBox",
+                            Header = "Grid Size",
+                            PlaceholderText = "Enter grid size...",
+                            InputScope = new InputScope
+                            {
+                                Names = { new InputScopeName { NameValue = InputScopeNameValue.Number } }
+                            }
+                        }
                     }
-                }
-            }
                 }
             };
 
-            // Show the dialog and wait for the result asynchronously
             ContentDialogResult result = await inputDialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -69,22 +61,33 @@ namespace W10MMineSweeper
                 }
                 else
                 {
-                    InitializeGrid(10); // Default value if parsing fails
-                    AddBordersToGrid(10);
+                    InitializeGrid(13); // Default value if parsing fails
+                    AddBordersToGrid(13);
                 }
             }
         }
 
+        private void InitializeGrid(int gridSize)
+        {
+            SweepGrid.ColumnDefinitions.Clear();
+            SweepGrid.RowDefinitions.Clear();
 
+            for (int i = 0; i < gridSize; i++)
+            {
+                SweepGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                SweepGrid.RowDefinitions.Add(new RowDefinition());
+            }
+        }
 
         private void AddBordersToGrid(int gridSize)
         {
             SweepGrid.Children.Clear();
+
             for (int row = 0; row < gridSize; row++)
             {
                 for (int col = 0; col < gridSize; col++)
                 {
-                    Border border = new Border
+                    var border = new Border
                     {
                         BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black),
                         BorderThickness = new Thickness(1)
@@ -95,16 +98,6 @@ namespace W10MMineSweeper
                 }
             }
         }
-        private void InitializeGrid(int gridSize)
-        {
-            SweepGrid.ColumnDefinitions.Clear();
-            SweepGrid.RowDefinitions.Clear();
-            for (int i = 0; i < gridSize; i++)
-            {
-                SweepGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                SweepGrid.RowDefinitions.Add(new RowDefinition());
-            }
-        }
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
@@ -113,7 +106,7 @@ namespace W10MMineSweeper
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // Restart button functionality here
         }
     }
 }
