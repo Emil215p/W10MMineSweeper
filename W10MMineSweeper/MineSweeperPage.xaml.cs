@@ -104,16 +104,41 @@ namespace W10MMineSweeper
             ContentDialog ResetDialog = new ContentDialog
             {
                 Title = "Do you want to reset?",
-                Content = "Thats cool but it has not been implemented yet.",
-                CloseButtonText = "OK"
+                Content = "Clicking 'Reset' will wipe any progress.",
+                PrimaryButtonText = "Reset",
+                CloseButtonText = "No"
             };
 
             ContentDialogResult result = await ResetDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                Frame.Navigate(typeof(MainPage));
+                Frame.Navigate(typeof(MineSweeperPage));
+            }
+        }
+
+        private async void DisplayQuitDialog()
+        {
+            ContentDialog QuitDialog = new ContentDialog
+            {
+                Title = "Do you want to quit?",
+                Content = "Progress will not be saved.",
+                PrimaryButtonText = "Yes",
+                CloseButtonText = "No"
+            };
+
+            ContentDialogResult result = await QuitDialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                Frame.Navigate(typeof(MainPage));
+            }
         }
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(MainPage));
+            DisplayQuitDialog();
         }
 
         private void RestartButton_Click(object sender, RoutedEventArgs e)
