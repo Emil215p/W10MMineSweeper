@@ -14,11 +14,30 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
+using System.ComponentModel;
 
 namespace W10MMineSweeper
 {
-    public sealed partial class MineSweeperPage : Page
+    public sealed partial class MineSweeperPage : Page, INotifyPropertyChanged
     {
+    public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private int _mineCount;
+        public int MineCount
+        {
+            get => _mineCount;
+            set
+            {
+                _mineCount = value;
+                OnPropertyChanged(nameof(MineCount));
+            }
+        }
+
         public MineSweeperPage()
         {
             this.InitializeComponent();
@@ -57,27 +76,47 @@ namespace W10MMineSweeper
                 if (int.TryParse(textBox.Text, out int gridSize))
                 {
                     InitializeGrid(gridSize);
+                    AddMinesToGrid(gridSize);
                     AddBordersToGrid(gridSize);
                 }
                 else
                 {
                     InitializeGrid(13); // Default if no input is put or if input is invalid
+                    AddMinesToGrid(13);
                     AddBordersToGrid(13);
                 }
             }
         }
 
-        private void InitializeGrid(int gridSize)
+        public class Cell
         {
-            SweepGrid.ColumnDefinitions.Clear();
-            SweepGrid.RowDefinitions.Clear();
-
-            for (int i = 0; i < gridSize; i++)
-            {
-                SweepGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                SweepGrid.RowDefinitions.Add(new RowDefinition());
-            }
+            public int Row { get; set; }
+            public int Column { get; set; }
         }
+
+private List<Cell> cells;
+
+private void InitializeGrid(int gridSize)
+{
+    SweepGrid.ColumnDefinitions.Clear();
+    SweepGrid.RowDefinitions.Clear();
+    cells = new List<Cell>();
+
+    for (int i = 0; i < gridSize; i++)
+    {
+        SweepGrid.ColumnDefinitions.Add(new ColumnDefinition());
+        SweepGrid.RowDefinitions.Add(new RowDefinition());
+    }
+
+    for (int row = 0; row < gridSize; row++)
+    {
+        for (int col = 0; col < gridSize; col++)
+        {
+            cells.Add(new Cell { Row = row, Column = col });
+        }
+    }
+}
+
 
         private void AddBordersToGrid(int gridSize)
         {
@@ -97,6 +136,24 @@ namespace W10MMineSweeper
                     SweepGrid.Children.Add(border);
                 }
             }
+        }
+
+        private void AddMinesToGrid(int gridSize)
+        {
+            Random random = new Random();
+            int randomNumber = random.Next(0, gridSize);
+            int mineCount = (int)(gridSize * gridSize * 0.20);
+            MineCount = mineCount;
+
+            if (MineCount > 0)
+            {
+
+            }
+        }
+
+        private void PlaceMines(int col, int row)
+        {
+            
         }
 
         private async void DisplayResetDialog()

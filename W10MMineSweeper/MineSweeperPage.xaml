@@ -40,7 +40,7 @@
         <TextBlock Grid.Row="3" Grid.Column="1" TextAlignment="Left" VerticalAlignment="Center" Margin="10, 0">
             Mines:
             <LineBreak />
-            30
+            <Run Text="{x:Bind MineCount, Mode=OneWay}"/>
         </TextBlock>
         </Border>
     </Grid>
