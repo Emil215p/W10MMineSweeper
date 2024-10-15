@@ -36,11 +36,11 @@ namespace W10MMineSweeper
         {
             
         }
-        private void DifficultyButton_Click(object sender, RoutedEventArgs e)
+        private void BackgroundsButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
-        private void ThemeButton_Click(object sender, RoutedEventArgs e)
+        private void ToggleMusicButton_Click(object sender, RoutedEventArgs e)
         {
 
         }

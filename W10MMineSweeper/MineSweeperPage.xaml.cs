@@ -61,7 +61,7 @@ namespace W10MMineSweeper
                 }
                 else
                 {
-                    InitializeGrid(13); // Default value if parsing fails
+                    InitializeGrid(13); // Default if no input is put or if input is invalid
                     AddBordersToGrid(13);
                 }
             }
