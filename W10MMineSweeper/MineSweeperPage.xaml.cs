@@ -15,12 +15,13 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using System.ComponentModel;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace W10MMineSweeper
 {
     public sealed partial class MineSweeperPage : Page, INotifyPropertyChanged
     {
-    public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -44,15 +45,16 @@ namespace W10MMineSweeper
             _ = GridSizeDialogAsync();
         }
 
-        private async Task GridSizeDialogAsync()
+
+    private async Task GridSizeDialogAsync()
+    {
+        ContentDialog inputDialog = new ContentDialog()
         {
-            ContentDialog inputDialog = new ContentDialog()
+            Title = "Set Grid Size (Default is 13)",
+            PrimaryButtonText = "OK",
+            Content = new StackPanel
             {
-                Title = "Set Grid Size (Default is 13)",
-                PrimaryButtonText = "OK",
-                Content = new StackPanel
-                {
-                    Children =
+                Children =
                     {
                         new TextBox
                         {
@@ -63,30 +65,63 @@ namespace W10MMineSweeper
                             {
                                 Names = { new InputScopeName { NameValue = InputScopeNameValue.Number } }
                             }
+                        },
+                        new TextBox
+                        {
+                            Name = "mineRatioTextBox",
+                            Header = "Mine ratio (in % (0.xx or xxx), leave empty for 20%)",
+                            PlaceholderText = "Enter mine ratio...",
+                            InputScope = new InputScope
+                            {
+                                Names = { new InputScopeName { NameValue = InputScopeNameValue.Number } }
+                            }
                         }
                     }
-                }
-            };
+            }
+        };
 
-            ContentDialogResult result = await inputDialog.ShowAsync();
+        ContentDialogResult result = await inputDialog.ShowAsync();
+        System.Diagnostics.Debug.WriteLine("Dialog result: " + result);
 
-            if (result == ContentDialogResult.Primary)
+        if (result == ContentDialogResult.Primary)
+        {
+            var textBoxSize = (TextBox)((StackPanel)inputDialog.Content).Children[0];
+            var textBoxRatio = (TextBox)((StackPanel)inputDialog.Content).Children[1];
+
+            if (int.TryParse(textBoxSize.Text, out int gridSize))
             {
-                var textBox = (TextBox)((StackPanel)inputDialog.Content).Children[0];
-                if (int.TryParse(textBox.Text, out int gridSize))
+                double mineRatio = 0.20; // Default mine ratio
+
+                if (double.TryParse(textBoxRatio.Text, out double parsedRatio))
                 {
-                    InitializeGrid(gridSize);
-                    AddMinesToGrid(gridSize);
-                    AddBordersToGrid(gridSize);
+                    mineRatio = parsedRatio / 100.0; // Convert percentage to decimal
                 }
-                else
-                {
-                    InitializeGrid(13); // Default if no input is put or if input is invalid
-                    AddMinesToGrid(13);
-                    AddBordersToGrid(13);
-                }
+
+                System.Diagnostics.Debug.WriteLine("Grid size from user input: " + gridSize);
+                System.Diagnostics.Debug.WriteLine("Mine ratio from user input: " + mineRatio);
+
+                InitializeGrid(gridSize);
+                AddBordersToGrid(gridSize);
+                AddMinesToGrid(gridSize, mineRatio);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid input; defaulting to grid size 13");
+                InitializeGrid(13);
+                AddBordersToGrid(13);
+                AddMinesToGrid(13, 0.20);
             }
         }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("Dialog dismissed without primary button click");
+        }
+
+        System.Diagnostics.Debug.WriteLine("Dialog processing complete");
+        SweepGrid.UpdateLayout();
+        System.Diagnostics.Debug.WriteLine("SweepGrid layout updated. Visibility: " + SweepGrid.Visibility);
+    }
+
 
         public class Cell
         {
@@ -94,34 +129,40 @@ namespace W10MMineSweeper
             public int Column { get; set; }
         }
 
-private List<Cell> cells;
+        private List<Cell> cells;
 
-private void InitializeGrid(int gridSize)
-{
-    SweepGrid.ColumnDefinitions.Clear();
-    SweepGrid.RowDefinitions.Clear();
-    cells = new List<Cell>();
-
-    for (int i = 0; i < gridSize; i++)
-    {
-        SweepGrid.ColumnDefinitions.Add(new ColumnDefinition());
-        SweepGrid.RowDefinitions.Add(new RowDefinition());
-    }
-
-    for (int row = 0; row < gridSize; row++)
-    {
-        for (int col = 0; col < gridSize; col++)
+        private void InitializeGrid(int gridSize)
         {
-            cells.Add(new Cell { Row = row, Column = col });
+            SweepGrid.ColumnDefinitions.Clear();
+            SweepGrid.RowDefinitions.Clear();
+            cells = new List<Cell>();
+            for (int i = 0; i < gridSize; i++)
+            {
+                SweepGrid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(1, GridUnitType.Star) });
+                SweepGrid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) });
+            }
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int col = 0; col < gridSize; col++)
+                {
+                    var cellBorder = new Border
+                    {
+                        BorderBrush = new SolidColorBrush(Windows.UI.Colors.Gray),
+                        BorderThickness = new Thickness(1)
+                    };
+                    Grid.SetRow(cellBorder, row);
+                    Grid.SetColumn(cellBorder, col);
+                    SweepGrid.Children.Add(cellBorder);
+                    cells.Add(new Cell { Row = row, Column = col });
+                }
+            }
+            SweepGrid.UpdateLayout();
+            System.Diagnostics.Debug.WriteLine("Grid initialized and layout updated with size: " + gridSize);
         }
-    }
-}
-
 
         private void AddBordersToGrid(int gridSize)
         {
             SweepGrid.Children.Clear();
-
             for (int row = 0; row < gridSize; row++)
             {
                 for (int col = 0; col < gridSize; col++)
@@ -136,25 +177,55 @@ private void InitializeGrid(int gridSize)
                     SweepGrid.Children.Add(border);
                 }
             }
+            System.Diagnostics.Debug.WriteLine("Borders added to grid");
         }
 
-        private void AddMinesToGrid(int gridSize)
+        private void AddMinesToGrid(int gridSize, double mineRatio)
         {
             Random random = new Random();
-            int randomNumber = random.Next(0, gridSize);
-            int mineCount = (int)(gridSize * gridSize * 0.20);
+            int mineCount = (int)(gridSize * gridSize * mineRatio);
             MineCount = mineCount;
+            HashSet<(int, int)> minePositions = new HashSet<(int, int)>();
 
-            if (MineCount > 0)
+            while (minePositions.Count < MineCount)
             {
+                int row = random.Next(0, gridSize);
+                int col = random.Next(0, gridSize);
 
+                if (!minePositions.Contains((row, col)))
+                {
+                    minePositions.Add((row, col));
+                    PlaceMines(col, row);
+                    System.Diagnostics.Debug.WriteLine($"Mine Button added at: ({row}, {col})");
+                }
             }
+            SweepGrid.UpdateLayout();
+            System.Diagnostics.Debug.WriteLine("Total mines placed: " + MineCount);
         }
 
         private void PlaceMines(int col, int row)
         {
-            
+            var mineImage = new Image
+            {
+                Source = new BitmapImage(new Uri("ms-appx:///Assets/Mine.png")), // Make sure the image is in the Assets folder and named 'mine.png'
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Visibility = Visibility.Visible // Ensure it is visible
+            };
+
+            var mineBorder = new Border
+            {
+                Background = new SolidColorBrush(Windows.UI.Colors.Transparent),
+                Child = mineImage
+            };
+
+            Grid.SetRow(mineBorder, row);
+            Grid.SetColumn(mineBorder, col);
+            SweepGrid.Children.Add(mineBorder);
+            System.Diagnostics.Debug.WriteLine($"Mine Image added at: ({row}, {col})");
+            SweepGrid.UpdateLayout(); // Force the layout to refresh
         }
+
 
         private async void DisplayResetDialog()
         {
@@ -165,9 +236,7 @@ private void InitializeGrid(int gridSize)
                 PrimaryButtonText = "Reset",
                 CloseButtonText = "No"
             };
-
             ContentDialogResult result = await ResetDialog.ShowAsync();
-
             if (result == ContentDialogResult.Primary)
             {
                 Frame.Navigate(typeof(MainPage));
