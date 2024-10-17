@@ -29,6 +29,9 @@ namespace W10MMineSweeper
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        Dictionary<(int, int), int> neighborMineCounts;
+        HashSet<(int, int)> minePositions = new HashSet<(int, int)>();
+        int gridSize;
         double mineRatio = 0;
         private int _mineCount;
         public int MineCount
@@ -89,7 +92,7 @@ namespace W10MMineSweeper
             ((TextBox)((StackPanel)inputDialog.Content).Children[1]).TextChanging += MineRatioTextBox_OnTextChanging;
 
             ContentDialogResult result = await inputDialog.ShowAsync();
-        System.Diagnostics.Debug.WriteLine("Dialog result: " + result);
+        //System.Diagnostics.Debug.WriteLine("Dialog result: " + result);
 
         if (result == ContentDialogResult.Primary)
         {
@@ -101,9 +104,9 @@ namespace W10MMineSweeper
 
                 if (double.TryParse(textBoxRatio.Text, out double parsedRatio))
                 {
-                    System.Diagnostics.Debug.WriteLine("Mine ratio submitted: " + parsedRatio);
+                    //System.Diagnostics.Debug.WriteLine("Mine ratio submitted: " + parsedRatio);
                     mineRatio = parsedRatio / 100.0; // Convert percentage to decimal
-                    System.Diagnostics.Debug.WriteLine("Parsed mine ratio: " + mineRatio);
+                    //System.Diagnostics.Debug.WriteLine("Parsed mine ratio: " + mineRatio);
                 }
 
                 if (mineRatio <= 0 || mineRatio > 1)
@@ -120,21 +123,22 @@ namespace W10MMineSweeper
                         }
                     }
 
-                System.Diagnostics.Debug.WriteLine("Grid size from user input: " + gridSize);
-                System.Diagnostics.Debug.WriteLine("Mine ratio from user input: " + mineRatio);
+                //System.Diagnostics.Debug.WriteLine("Grid size from user input: " + gridSize);
+                //System.Diagnostics.Debug.WriteLine("Mine ratio from user input: " + mineRatio);
 
                 InitializeGrid(gridSize);
                 AddBordersToGrid(gridSize);
                 AddMinesToGrid(gridSize, mineRatio);
-                CountNearbyMines();
+                CountNearbyMines(gridSize);
+                DisplayNeighborMineCounts();
                 }
             else
             {
                     if (double.TryParse(textBoxRatio.Text, out double parsedRatio))
                     {
-                        System.Diagnostics.Debug.WriteLine("Mine ratio submitted: " + parsedRatio);
+                        //System.Diagnostics.Debug.WriteLine("Mine ratio submitted: " + parsedRatio);
                         mineRatio = parsedRatio / 100.0; // Convert percentage to decimal
-                        System.Diagnostics.Debug.WriteLine("Parsed mine ratio: " + mineRatio);
+                        //System.Diagnostics.Debug.WriteLine("Parsed mine ratio: " + mineRatio);
                     }
 
                     if (mineRatio <= 0 || mineRatio > 1)
@@ -142,11 +146,12 @@ namespace W10MMineSweeper
                         mineRatio = 0.20;
                     }
 
-                System.Diagnostics.Debug.WriteLine("Invalid input; defaulting to grid size 13");
+                System.Diagnostics.Debug.WriteLine("Invalid input; defaulting.");
                 InitializeGrid(13);
                 AddBordersToGrid(13);
                 AddMinesToGrid(13, mineRatio);
-                CountNearbyMines();
+                CountNearbyMines(13);
+                DisplayNeighborMineCounts();
             }
         }
         else
@@ -222,23 +227,28 @@ namespace W10MMineSweeper
             Random random = new Random();
             int mineCount = (int)(gridSize * gridSize * mineRatio);
             MineCount = mineCount;
-            HashSet<(int, int)> minePositions = new HashSet<(int, int)>();
+            minePositions.Clear(); // Ensure it's clear before adding new mines
 
             while (minePositions.Count < MineCount)
             {
                 int row = random.Next(0, gridSize);
                 int col = random.Next(0, gridSize);
-
                 if (!minePositions.Contains((row, col)))
                 {
                     minePositions.Add((row, col));
                     PlaceMines(col, row);
-                    System.Diagnostics.Debug.WriteLine($"Mine Button added at: ({row}, {col})");
+                    System.Diagnostics.Debug.WriteLine($"Mine placed at: ({row}, {col})");
                 }
             }
-            SweepGrid.UpdateLayout();
+
             System.Diagnostics.Debug.WriteLine("Total mines placed: " + MineCount);
+            System.Diagnostics.Debug.WriteLine("Mine locations:");
+            foreach (var position in minePositions)
+            {
+                System.Diagnostics.Debug.WriteLine($"Row: {position.Item1}, Column: {position.Item2}");
+            }
         }
+
 
         private void PlaceMines(int col, int row)
         {
@@ -259,14 +269,112 @@ namespace W10MMineSweeper
             Grid.SetRow(mineBorder, row);
             Grid.SetColumn(mineBorder, col);
             SweepGrid.Children.Add(mineBorder);
-            System.Diagnostics.Debug.WriteLine($"Mine Image added at: ({row}, {col})");
+            //System.Diagnostics.Debug.WriteLine($"Mine Image added at: ({row}, {col})");
             SweepGrid.UpdateLayout(); // Force the layout to refresh
         }
 
-        private void CountNearbyMines()
+        private void CountNearbyMines(int gridSize)
         {
+            System.Diagnostics.Debug.WriteLine("Counting nearby mines... " + gridSize);
+            neighborMineCounts = new Dictionary<(int, int), int>();
 
+            System.Diagnostics.Debug.WriteLine("Initialized neighborMineCounts");
+
+            int[] rowOffsets = { -1, -1, -1, 0, 0, 1, 1, 1 };
+            int[] colOffsets = { -1, 0, 1, -1, 1, -1, 0, 1 };
+
+            System.Diagnostics.Debug.WriteLine($"Grid size: {gridSize}");
+            System.Diagnostics.Debug.WriteLine("Mine positions:");
+            foreach (var pos in minePositions)
+            {
+                System.Diagnostics.Debug.WriteLine($"Mine at: ({pos.Item1}, {pos.Item2})");
+            }
+
+            foreach (var cell in cells)
+            {
+                if (cell.Row >= gridSize || cell.Column >= gridSize)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Invalid cell detected: ({cell.Row}, {cell.Column})");
+                    continue;
+                }
+
+                int neighborMineCount = 0;
+                System.Diagnostics.Debug.WriteLine($"Checking cell at ({cell.Row}, {cell.Column}):");
+
+                for (int i = 0; i < 8; i++)
+                {
+                    int newRow = cell.Row + rowOffsets[i];
+                    int newCol = cell.Column + colOffsets[i];
+                    if (newRow < 0 || newRow >= gridSize || newCol < 0 || newCol >= gridSize)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Skipping neighbor at ({newRow}, {newCol}) - out of bounds");
+                        continue;
+                    }
+                    if (minePositions.Contains((newRow, newCol)))
+                    {
+                        neighborMineCount++;
+                        System.Diagnostics.Debug.WriteLine($"Mine found at: ({newRow}, {newCol}) for cell ({cell.Row}, {cell.Column})");
+                    }
+                }
+                neighborMineCounts[(cell.Row, cell.Column)] = neighborMineCount;
+            }
+            System.Diagnostics.Debug.WriteLine("Finished counting nearby mines.");
+            System.Diagnostics.Debug.WriteLine("Neighbor Mine Counts:");
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int col = 0; col < gridSize; col++)
+                {
+                    System.Diagnostics.Debug.Write(neighborMineCounts.ContainsKey((row, col)) ? neighborMineCounts[(row, col)] + " " : "0 ");
+                }
+                System.Diagnostics.Debug.WriteLine("");
+            }
         }
+
+        private void DisplayNeighborMineCounts()
+        {
+            if (neighborMineCounts == null)
+            {
+                System.Diagnostics.Debug.WriteLine("neighborMineCounts is null!");
+                return;
+            }
+
+            foreach (var cell in cells)
+            {
+                int mineCount = neighborMineCounts.ContainsKey((cell.Row, cell.Column)) ? neighborMineCounts[(cell.Row, cell.Column)] : 0;
+                var cellTextBlock = new TextBlock
+                {
+                    Text = mineCount > 0 ? mineCount.ToString() : "",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = new SolidColorBrush(Windows.UI.Colors.Red), // Red font color
+                };
+
+                // Check if each cell is valid
+                System.Diagnostics.Debug.WriteLine($"Processing cell at ({cell.Row}, {cell.Column})");
+
+                // Locate the corresponding cell border and update it
+                var cellBorder = SweepGrid.Children
+                    .Cast<FrameworkElement>()
+                    .FirstOrDefault(e => Grid.GetRow(e) == cell.Row && Grid.GetColumn(e) == cell.Column);
+
+                if (cellBorder == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"No cellBorder found for cell at ({cell.Row}, {cell.Column})");
+                    continue;
+                }
+
+                if (cellBorder is Border border)
+                {
+                    border.Child = cellTextBlock;
+                    System.Diagnostics.Debug.WriteLine($"Updated cell at ({cell.Row}, {cell.Column}) with count: {mineCount}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Element at ({cell.Row}, {cell.Column}) is not a Border");
+                }
+            }
+        }
+
 
         private async void DisplayResetDialog()
         {
