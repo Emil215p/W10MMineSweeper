@@ -268,12 +268,12 @@ namespace W10MMineSweeper
                 if (existingFlag == null)
                 {
                     // Right clicking on PC adds a flag to a unrevealed tile, long tap for mobile.
-                    var flag = new TextBlock
+                    var flag = new Image
                     {
-                        Text = "🚩",
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Foreground = new SolidColorBrush(Windows.UI.Colors.Red) // Red font color
+                        Source = new BitmapImage(new Uri("ms-appx:///Assets/MineFlag.png")), // Make sure the image is in the Assets folder and named 'mine.png'
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        Visibility = Visibility.Visible // Ensure it is visible
                     };
                     border.Child = flag;
 
