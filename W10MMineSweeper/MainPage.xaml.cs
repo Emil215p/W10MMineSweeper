@@ -49,7 +49,7 @@ namespace W10MMineSweeper
             ContentDialog HelpDialog = new ContentDialog
             {
                 Title = "To play",
-                Content = "Click start and then click on a field, to mark a mine long click, if unsure if its a mine long click again.",
+                Content = "Click 'Start' and then define the grid you want. Left click or tap to reveal a field. Long press or if on PC right click to mark a field if you think it contains a mine, repeat to unmark. You win if all fields are revealed and all mines are marked.",
                 CloseButtonText = "OK"
             };
 

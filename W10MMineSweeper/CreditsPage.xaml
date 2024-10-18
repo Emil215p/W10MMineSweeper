@@ -21,12 +21,33 @@
         <Border Grid.Row="0" Grid.Column="0" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" CornerRadius="10" Background="Gray">
             <TextBlock Grid.Row="0" Grid.Column="0" FontSize="30" TextAlignment="Center">Credits</TextBlock>
         </Border>
-        <Border Grid.Row="1" Grid.Column="0" BorderBrush="Gray" BorderThickness="2" MaxHeight="50" CornerRadius="10" Background="Gray">
-            <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Center" >
-            This app has been developed by Emil215p.<LineBreak/>
-            <LineBreak/>Contact:<LineBreak/>Emil215p@gmail.com<LineBreak/><LineBreak/>
-            With help from:
-            </TextBlock>
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="Gray" BorderThickness="2" CornerRadius="10" Background="Gray">
+            <ScrollViewer Grid.Row="1" Grid.Column="0">
+                <TextBlock>
+                    This app has been developed by Emil215p.
+                    <LineBreak/>
+                    <LineBreak/>
+                    Contact:
+                    <LineBreak/>
+                    juelemil@gmail.com
+                    <LineBreak/>
+                    <LineBreak/>
+                    With help from:
+                    <LineBreak/>
+                    N/A
+                    <LineBreak/>
+                    Changelog:
+                    <LineBreak/>
+                    1.0A (First alpha)
+                    Game is ready,
+                    <LineBreak/>
+                    missing victory screen.
+                    <LineBreak/>
+                    Missing expansion on empty click.
+                    <LineBreak/>
+                    Options are not working.
+                </TextBlock>
+            </ScrollViewer>
         </Border>
 
         <Button Grid.Row="2" Grid.Column="0" Content="Return" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Green" FontSize="20" Padding="20, 10, 20, 10" Click="ReturnButton_Click"/>
