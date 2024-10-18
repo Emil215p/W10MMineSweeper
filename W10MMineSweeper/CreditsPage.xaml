@@ -46,6 +46,10 @@
                     Missing expansion on empty click.
                     <LineBreak/>
                     Options are not working.
+                    <LineBreak/><LineBreak/>
+                    1.0B (Victory is achieveable)
+                    <LineBreak/>
+                    You can now win the game.
                 </TextBlock>
             </ScrollViewer>
         </Border>

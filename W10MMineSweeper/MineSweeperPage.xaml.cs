@@ -86,11 +86,8 @@ namespace W10MMineSweeper
                     }
             }
         };
-
             // Attach event handlers after creating the dialog
             ((TextBox)((StackPanel)inputDialog.Content).Children[0]).TextChanging += GridSizeTextBox_OnTextChanging;
-
-            // Attach event handlers after creating the dialog
             ((TextBox)((StackPanel)inputDialog.Content).Children[1]).TextChanging += MineRatioTextBox_OnTextChanging;
 
             ContentDialogResult result = await inputDialog.ShowAsync();
@@ -210,7 +207,6 @@ namespace W10MMineSweeper
             {
                 for (int col = 0; col < gridSize; col++)
                 {
-                    // Add cover dynamically
                     var cellCover = new Border
                     {
                         Background = new SolidColorBrush(Windows.UI.Colors.LightGray),
@@ -239,6 +235,21 @@ namespace W10MMineSweeper
             //System.Diagnostics.Debug.WriteLine("Borders and covers added to grid");
         }
 
+        private int CountUnflaggedCoveredCells()
+        {
+            int count = 0;
+            foreach (var child in SweepGrid.Children)
+            {
+                if (child is Border border && Canvas.GetZIndex(border) == 2 && border.Visibility == Visibility.Visible && border.Child == null)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+
+
         private async void CellCover_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var border = sender as Border;
@@ -253,6 +264,8 @@ namespace W10MMineSweeper
                 else
                 {
                     border.Visibility = Visibility.Collapsed;
+
+                    VictoryCheck();
                 }
             }
         }
@@ -263,7 +276,7 @@ namespace W10MMineSweeper
             if (border != null)
             {
                 var position = (ValueTuple<int, int>)border.Tag; // Retrieve position from Tag
-                var existingFlag = border.Child as TextBlock;
+                var existingFlag = border.Child as Image;
 
                 if (existingFlag == null)
                 {
@@ -278,19 +291,58 @@ namespace W10MMineSweeper
                     border.Child = flag;
 
                     MineCount--;
+
+                    if (MineCount == 0)
+                    {
+                        VictoryCheck();
+                    }
                 }
                 else
                 {
                     // Remove flag
                     border.Child = null;
                     MineCount++;
+                    if (MineCount == 0)
+                    {
+                        VictoryCheck();
+                    }
                 }
             }
         }
 
+        private void VictoryCheck()
+        {
+            int unflaggedCoveredCount = CountUnflaggedCoveredCells();
 
+            if (MineCount == 0 && (unflaggedCoveredCount) == 0)
+            {
+                ShowVictoryDialog();
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Not won, Mines left: " + MineCount + " Needs to reveal: " + (unflaggedCoveredCount));
+                return;
+            }
+        }
 
-        private async Task ShowResetDialog()
+        private async void ShowVictoryDialog()
+        {
+            ContentDialog VictoryDialog = new ContentDialog
+            {
+                Title = "You cleared the minefield!",
+                Content = "Clear another?",
+                PrimaryButtonText = "Yes",
+                CloseButtonText = "No"
+            };
+        ContentDialogResult result = await VictoryDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                Frame.Navigate(typeof(MainPage));
+                Frame.Navigate(typeof(MineSweeperPage));
+            }
+        }
+
+private async Task ShowResetDialog()
         {
             ContentDialog resetDialog = new ContentDialog
             {
