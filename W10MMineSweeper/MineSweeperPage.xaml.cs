@@ -148,7 +148,7 @@ namespace W10MMineSweeper
                         mineRatio = 0.20;
                     }
 
-                System.Diagnostics.Debug.WriteLine("Invalid input; defaulting.");
+                //System.Diagnostics.Debug.WriteLine("Invalid input; defaulting.");
                 InitializeGrid(13);
                 AddBordersToGrid(13);
                 AddMinesToGrid(13, mineRatio);
@@ -201,7 +201,7 @@ namespace W10MMineSweeper
                 }
             }
             SweepGrid.UpdateLayout();
-            System.Diagnostics.Debug.WriteLine("Grid initialized and layout updated with size: " + gridSize);
+            //System.Diagnostics.Debug.WriteLine("Grid initialized and layout updated with size: " + gridSize);
         }
 
         private void AddBordersToGrid(int gridSize)
@@ -262,9 +262,32 @@ namespace W10MMineSweeper
             var border = sender as Border;
             if (border != null)
             {
-                cellCover = 
+                var position = (ValueTuple<int, int>)border.Tag; // Retrieve position from Tag
+                var existingFlag = border.Child as TextBlock;
+
+                if (existingFlag == null)
+                {
+                    // Right clicking on PC adds a flag to a unrevealed tile, long tap for mobile.
+                    var flag = new TextBlock
+                    {
+                        Text = "🚩",
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Foreground = new SolidColorBrush(Windows.UI.Colors.Red) // Red font color
+                    };
+                    border.Child = flag;
+
+                    MineCount--;
+                }
+                else
+                {
+                    // Remove flag
+                    border.Child = null;
+                    MineCount++;
+                }
             }
         }
+
 
 
         private async Task ShowResetDialog()
@@ -309,12 +332,12 @@ namespace W10MMineSweeper
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine("Total mines placed: " + MineCount);
-            System.Diagnostics.Debug.WriteLine("Mine locations:");
-            foreach (var position in minePositions)
-            {
+            //System.Diagnostics.Debug.WriteLine("Total mines placed: " + MineCount);
+            //System.Diagnostics.Debug.WriteLine("Mine locations:");
+            //foreach (var position in minePositions)
+            //{
                 //System.Diagnostics.Debug.WriteLine($"Row: {position.Item1}, Column: {position.Item2}");
-            }
+            //}
         }
 
 
@@ -346,7 +369,7 @@ namespace W10MMineSweeper
             //System.Diagnostics.Debug.WriteLine("Counting nearby mines... " + gridSize);
             neighborMineCounts = new Dictionary<(int, int), int>();
 
-            System.Diagnostics.Debug.WriteLine("Initialized neighborMineCounts");
+            //System.Diagnostics.Debug.WriteLine("Initialized neighborMineCounts");
 
             int[] rowOffsets = { -1, -1, -1, 0, 0, 1, 1, 1 };
             int[] colOffsets = { -1, 0, 1, -1, 1, -1, 0, 1 };
