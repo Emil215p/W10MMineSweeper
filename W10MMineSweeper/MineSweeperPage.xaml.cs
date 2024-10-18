@@ -17,6 +17,8 @@ using Windows.UI.Core;
 using System.ComponentModel;
 using Windows.UI.Xaml.Media.Imaging;
 using System.Text.RegularExpressions;
+using Windows.UI.Xaml.Shapes;
+using Windows.UI.Input;
 
 namespace W10MMineSweeper
 {
@@ -159,9 +161,9 @@ namespace W10MMineSweeper
             System.Diagnostics.Debug.WriteLine("Dialog dismissed without primary button click");
         }
 
-        System.Diagnostics.Debug.WriteLine("Dialog processing complete");
+        //System.Diagnostics.Debug.WriteLine("Dialog processing complete");
         SweepGrid.UpdateLayout();
-        System.Diagnostics.Debug.WriteLine("SweepGrid layout updated. Visibility: " + SweepGrid.Visibility);
+        //System.Diagnostics.Debug.WriteLine("SweepGrid layout updated. Visibility: " + SweepGrid.Visibility);
     }
 
 
@@ -204,22 +206,88 @@ namespace W10MMineSweeper
 
         private void AddBordersToGrid(int gridSize)
         {
-            SweepGrid.Children.Clear();
             for (int row = 0; row < gridSize; row++)
             {
                 for (int col = 0; col < gridSize; col++)
                 {
-                    var border = new Border
+                    // Add cover dynamically
+                    var cellCover = new Border
+                    {
+                        Background = new SolidColorBrush(Windows.UI.Colors.LightGray),
+                        Opacity = 1,
+                        Tag = (row, col) // Tag for identification
+                    };
+                    Canvas.SetZIndex(cellCover, 2); // Ensure the cover is on top of the border
+                    cellCover.Tapped += CellCover_Tapped;
+                    cellCover.RightTapped += CellCover_RightTapped;
+                    Grid.SetRow(cellCover, row);
+                    Grid.SetColumn(cellCover, col);
+                    SweepGrid.Children.Add(cellCover);
+
+                    // Border for cover elements.
+                    var coverBorder = new Border
                     {
                         BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black),
                         BorderThickness = new Thickness(1)
                     };
-                    Grid.SetRow(border, row);
-                    Grid.SetColumn(border, col);
-                    SweepGrid.Children.Add(border);
+                    Grid.SetRow(coverBorder, row);
+                    Grid.SetColumn(coverBorder, col);
+                    Canvas.SetZIndex(coverBorder, 3); // Ensure the border is on top of the cover
+                    SweepGrid.Children.Add(coverBorder);
                 }
             }
-            System.Diagnostics.Debug.WriteLine("Borders added to grid");
+            //System.Diagnostics.Debug.WriteLine("Borders and covers added to grid");
+        }
+
+        private async void CellCover_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var border = sender as Border;
+            if (border != null)
+            {
+                var position = (ValueTuple<int, int>)border.Tag;
+                if (minePositions.Contains(position))
+                {
+                    border.Visibility = Visibility.Collapsed;
+                    await ShowResetDialog();
+                }
+                else
+                {
+                    border.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void CellCover_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            var border = sender as Border;
+            if (border != null)
+            {
+                cellCover = 
+            }
+        }
+
+
+        private async Task ShowResetDialog()
+        {
+            ContentDialog resetDialog = new ContentDialog
+            {
+                Title = "Game Over",
+                Content = "You blew up.",
+                PrimaryButtonText = "Restart",
+                SecondaryButtonText = "Exit"
+            };
+
+            ContentDialogResult result = await resetDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                Frame.Navigate(typeof(MainPage));
+                Frame.Navigate(typeof(MineSweeperPage));
+            }
+
+            if (result == ContentDialogResult.Secondary)
+            {
+                Frame.Navigate(typeof(MainPage));
+            }
         }
 
         private void AddMinesToGrid(int gridSize, double mineRatio)
@@ -237,7 +305,7 @@ namespace W10MMineSweeper
                 {
                     minePositions.Add((row, col));
                     PlaceMines(col, row);
-                    System.Diagnostics.Debug.WriteLine($"Mine placed at: ({row}, {col})");
+                    //System.Diagnostics.Debug.WriteLine($"Mine placed at: ({row}, {col})");
                 }
             }
 
@@ -245,7 +313,7 @@ namespace W10MMineSweeper
             System.Diagnostics.Debug.WriteLine("Mine locations:");
             foreach (var position in minePositions)
             {
-                System.Diagnostics.Debug.WriteLine($"Row: {position.Item1}, Column: {position.Item2}");
+                //System.Diagnostics.Debug.WriteLine($"Row: {position.Item1}, Column: {position.Item2}");
             }
         }
 
@@ -275,7 +343,7 @@ namespace W10MMineSweeper
 
         private void CountNearbyMines(int gridSize)
         {
-            System.Diagnostics.Debug.WriteLine("Counting nearby mines... " + gridSize);
+            //System.Diagnostics.Debug.WriteLine("Counting nearby mines... " + gridSize);
             neighborMineCounts = new Dictionary<(int, int), int>();
 
             System.Diagnostics.Debug.WriteLine("Initialized neighborMineCounts");
@@ -283,23 +351,23 @@ namespace W10MMineSweeper
             int[] rowOffsets = { -1, -1, -1, 0, 0, 1, 1, 1 };
             int[] colOffsets = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
-            System.Diagnostics.Debug.WriteLine($"Grid size: {gridSize}");
-            System.Diagnostics.Debug.WriteLine("Mine positions:");
+            //System.Diagnostics.Debug.WriteLine($"Grid size: {gridSize}");
+            //System.Diagnostics.Debug.WriteLine("Mine positions:");
             foreach (var pos in minePositions)
             {
-                System.Diagnostics.Debug.WriteLine($"Mine at: ({pos.Item1}, {pos.Item2})");
+                //System.Diagnostics.Debug.WriteLine($"Mine at: ({pos.Item1}, {pos.Item2})");
             }
 
             foreach (var cell in cells)
             {
                 if (cell.Row >= gridSize || cell.Column >= gridSize)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Invalid cell detected: ({cell.Row}, {cell.Column})");
+                    //System.Diagnostics.Debug.WriteLine($"Invalid cell detected: ({cell.Row}, {cell.Column})");
                     continue;
                 }
 
                 int neighborMineCount = 0;
-                System.Diagnostics.Debug.WriteLine($"Checking cell at ({cell.Row}, {cell.Column}):");
+                //System.Diagnostics.Debug.WriteLine($"Checking cell at ({cell.Row}, {cell.Column}):");
 
                 for (int i = 0; i < 8; i++)
                 {
@@ -307,27 +375,27 @@ namespace W10MMineSweeper
                     int newCol = cell.Column + colOffsets[i];
                     if (newRow < 0 || newRow >= gridSize || newCol < 0 || newCol >= gridSize)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Skipping neighbor at ({newRow}, {newCol}) - out of bounds");
+                        //System.Diagnostics.Debug.WriteLine($"Skipping neighbor at ({newRow}, {newCol}) - out of bounds");
                         continue;
                     }
                     if (minePositions.Contains((newRow, newCol)))
                     {
                         neighborMineCount++;
-                        System.Diagnostics.Debug.WriteLine($"Mine found at: ({newRow}, {newCol}) for cell ({cell.Row}, {cell.Column})");
+                        //System.Diagnostics.Debug.WriteLine($"Mine found at: ({newRow}, {newCol}) for cell ({cell.Row}, {cell.Column})");
                     }
                 }
                 neighborMineCounts[(cell.Row, cell.Column)] = neighborMineCount;
             }
-            System.Diagnostics.Debug.WriteLine("Finished counting nearby mines.");
-            System.Diagnostics.Debug.WriteLine("Neighbor Mine Counts:");
-            for (int row = 0; row < gridSize; row++)
-            {
-                for (int col = 0; col < gridSize; col++)
-                {
-                    System.Diagnostics.Debug.Write(neighborMineCounts.ContainsKey((row, col)) ? neighborMineCounts[(row, col)] + " " : "0 ");
-                }
-                System.Diagnostics.Debug.WriteLine("");
-            }
+            //System.Diagnostics.Debug.WriteLine("Finished counting nearby mines.");
+            //System.Diagnostics.Debug.WriteLine("Neighbor Mine Counts:");
+            //for (int row = 0; row < gridSize; row++)
+            //{
+            //    for (int col = 0; col < gridSize; col++)
+            //    {
+            //        System.Diagnostics.Debug.Write(neighborMineCounts.ContainsKey((row, col)) ? neighborMineCounts[(row, col)] + " " : "0 ");
+            //    }
+            //    System.Diagnostics.Debug.WriteLine("");
+            //}
         }
 
         private void DisplayNeighborMineCounts()
@@ -350,7 +418,7 @@ namespace W10MMineSweeper
                 };
 
                 // Check if each cell is valid
-                System.Diagnostics.Debug.WriteLine($"Processing cell at ({cell.Row}, {cell.Column})");
+                //System.Diagnostics.Debug.WriteLine($"Processing cell at ({cell.Row}, {cell.Column})");
 
                 // Locate the corresponding cell border and update it
                 var cellBorder = SweepGrid.Children
@@ -359,18 +427,18 @@ namespace W10MMineSweeper
 
                 if (cellBorder == null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"No cellBorder found for cell at ({cell.Row}, {cell.Column})");
+                    //System.Diagnostics.Debug.WriteLine($"No cellBorder found for cell at ({cell.Row}, {cell.Column})");
                     continue;
                 }
 
                 if (cellBorder is Border border)
                 {
                     border.Child = cellTextBlock;
-                    System.Diagnostics.Debug.WriteLine($"Updated cell at ({cell.Row}, {cell.Column}) with count: {mineCount}");
+                    //System.Diagnostics.Debug.WriteLine($"Updated cell at ({cell.Row}, {cell.Column}) with count: {mineCount}");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine($"Element at ({cell.Row}, {cell.Column}) is not a Border");
+                    //System.Diagnostics.Debug.WriteLine($"Element at ({cell.Row}, {cell.Column}) is not a Border");
                 }
             }
         }
@@ -444,8 +512,6 @@ namespace W10MMineSweeper
                 }
             }
         }
-
-
 
         private void MineRatioTextBox_OnTextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
